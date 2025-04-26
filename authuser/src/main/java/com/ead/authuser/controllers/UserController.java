@@ -1,5 +1,6 @@
 package com.ead.authuser.controllers;
 
+import com.ead.authuser.exceptions.NotFoundException;
 import com.ead.authuser.models.UserModel;
 import com.ead.authuser.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,8 +24,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
     }
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getOneUser(@PathVariable(value = "userId")UUID userId){
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(userId).get());
+    public Optional<UserModel> getOneUser(@PathVariable(value = "userId")UUID userId){
+        Optional<UserModel> optionalUserModel = userService.findById(userId);
+        if(optionalUserModel.isEmpty()){
+            throw new NotFoundException("Error: User not found.");
+        }
+        return optionalUserModel;
     }
 
     @DeleteMapping("/{userId}")
