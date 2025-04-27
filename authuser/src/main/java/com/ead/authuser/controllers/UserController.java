@@ -8,6 +8,7 @@ import com.ead.authuser.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,7 +41,8 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<Object> updateUser(@PathVariable(value = "userId")UUID userId,
-                                             @RequestBody @JsonView(UserView.UserPut.class)
+                                             @RequestBody @Validated(UserView.UserPut.class)
+                                             @JsonView(UserView.UserPut.class)
                                              UserRecordDto userRecordDto){
 
         var userModel = getOneUser(userId);
@@ -49,7 +51,8 @@ public class UserController {
 
     @PutMapping("/{userId}/password")
     public ResponseEntity<Object> updatePassword(@PathVariable(value = "userId")UUID userId,
-                                             @RequestBody @JsonView(UserView.PasswordPut.class)
+                                             @RequestBody @Validated(UserView.PasswordPut.class)
+                                             @JsonView(UserView.PasswordPut.class)
                                              UserRecordDto userRecordDto){
 
         var userModel = getOneUser(userId);
@@ -62,7 +65,8 @@ public class UserController {
 
     @PutMapping("/{userId}/image")
     public ResponseEntity<Object> updateImage(@PathVariable(value = "userId")UUID userId,
-                                                 @RequestBody @JsonView(UserView.ImagePut.class)
+                                                 @RequestBody @Validated(UserView.ImagePut.class)
+                                                 @JsonView(UserView.ImagePut.class)
                                                  UserRecordDto userRecordDto){
 
         var userModel = getOneUser(userId);
