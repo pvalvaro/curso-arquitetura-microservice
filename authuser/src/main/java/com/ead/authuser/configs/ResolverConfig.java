@@ -1,5 +1,6 @@
 package com.ead.authuser.configs;
 
+import net.kaczmarzyk.spring.data.jpa.web.SpecificationArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -13,6 +14,7 @@ import java.util.List;
 public class ResolverConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentsResolvers){
+        argumentsResolvers.add(new SpecificationArgumentResolver());
         var pageable = new PageableHandlerMethodArgumentResolver();
         pageable.setFallbackPageable(PageRequest.of(0, 10));
         argumentsResolvers.add(pageable);
