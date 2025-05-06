@@ -1,6 +1,8 @@
 package com.ead.course.services.impl;
 
 import com.ead.course.dtos.LessonRecordDto;
+import com.ead.course.exceptions.ConflictException;
+import com.ead.course.exceptions.NotFoundException;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.repositories.LessonRepository;
@@ -12,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,10 +24,17 @@ public class LessonServiceImpl implements LessonService {
         this.lessonRepository = lessonRepository;
     }
 
-    @Transactional
     @Override
-    public void delete(LessonModel lesson) {
-        lessonRepository.delete(lesson);
+    public LessonModel save(LessonRecordDto lessonRecordDto, ModuleModel moduleModel) {
+        var lesson = new LessonModel();
+
+        if (lessonRepository.existsByTitle(lessonRecordDto.title())) {
+            throw new ConflictException("Error: Lesson already exists");
+        }
+        BeanUtils.copyProperties(lessonRecordDto, lesson);
+        lesson.setModule(moduleModel);
+        lesson.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        return lessonRepository.save(lesson);
     }
 
     @Override
@@ -35,28 +43,8 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public LessonModel save(LessonRecordDto lessonRecordDto, ModuleModel moduleModel) {
-        var lesson = new LessonModel();
-        BeanUtils.copyProperties(lessonRecordDto, lesson);
-        lesson.setModule(moduleModel);
-        lesson.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
-        return lessonRepository.save(lesson);
-    }
-
-    @Override
     public List<LessonModel> findAll() {
         return lessonRepository.findAll();
-    }
-
-    @Override
-    public Optional<LessonModel> findById(UUID lessonId) {
-        return lessonRepository.findById(lessonId);
-    }
-
-    @Override
-    public LessonModel update(LessonRecordDto lessonRecordDto, LessonModel lessonModel) {
-        BeanUtils.copyProperties(lessonRecordDto, lessonModel);
-        return lessonRepository.save(lessonModel);
     }
 
     @Override
@@ -65,11 +53,27 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
-    public Optional<LessonModel> findLessonIntoModule(UUID moduleId, UUID lessonId) {
-        Optional<LessonModel> lessonModel = lessonRepository.findLessonIntoModule(moduleId, lessonId);
-        if(lessonModel.isEmpty()){
-            // exceptions
-        }
-        return lessonModel;
+    public LessonModel findById(UUID lessonId) {
+        return lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new NotFoundException("Error: Lesson not found"));
+    }
+
+    @Override
+    public LessonModel findLessonIntoModule(UUID moduleId, UUID lessonId) {
+        return lessonRepository.findLessonIntoModule(moduleId, lessonId)
+                .orElseThrow(() -> new NotFoundException("Error: Lesson not found for this module"));
+    }
+
+    @Transactional
+    @Override
+    public void delete(LessonModel lesson) {
+        lessonRepository.delete(lesson);
+    }
+
+    @Transactional
+    @Override
+    public LessonModel update(LessonRecordDto lessonRecordDto, LessonModel lessonModel) {
+        BeanUtils.copyProperties(lessonRecordDto, lessonModel);
+        return lessonRepository.save(lessonModel);
     }
 }

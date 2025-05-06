@@ -1,14 +1,16 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.CourseRecordDto;
-import com.ead.course.exceptions.NotFoundException;
 import com.ead.course.models.CourseModel;
 import com.ead.course.services.CourseService;
+import com.ead.course.specifications.SpecificationTemplate;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,37 +25,28 @@ public class CourseController {
 
     @PostMapping
     public ResponseEntity<Object> saveCourse(@RequestBody @Valid CourseRecordDto courseRecordDto) {
-        if (courseService.existsByName(courseRecordDto.name())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Course is Already taken!");
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(courseService.save(courseRecordDto));
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseModel>> getAllCourses() {
-        return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll());
+    public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec spec, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, pageable));
     }
 
     @GetMapping("/{courseId}")
     public ResponseEntity<Object> getOneCourse(@PathVariable(value = "courseId") UUID courseId) {
-        CourseModel course = courseService.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Error: Course not found"));
-        return ResponseEntity.status(HttpStatus.OK).body(course);
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.findById(courseId));
     }
 
     @DeleteMapping("/{courseId}")
     public ResponseEntity<Object> deleteCourse(@PathVariable(value = "courseId") UUID courseId){
-        CourseModel course = courseService.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Error: Course not found"));
-        courseService.delete(course);
+        courseService.delete(courseService.findById(courseId));
         return ResponseEntity.status(HttpStatus.OK).body("Course deleted successfully");
     }
 
     @PutMapping("/{courseId}")
     public ResponseEntity<Object> updateCourse(@PathVariable(value = "courseId") UUID courseId,
                                              @RequestBody @Valid CourseRecordDto courseRecordDto){
-        CourseModel course = courseService.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Error: Course not found"));
-        return ResponseEntity.status(HttpStatus.OK).body(courseService.update(courseRecordDto, course));
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.update(courseRecordDto, courseService.findById(courseId)));
     }
 }

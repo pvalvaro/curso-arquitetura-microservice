@@ -1,8 +1,6 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.ModuleRecordDto;
-import com.ead.course.exceptions.NotFoundException;
-import com.ead.course.models.CourseModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.services.ModuleService;
@@ -27,14 +25,11 @@ public class ModuleController {
     @PostMapping("/courses/{courseId}/modules")
     public ResponseEntity<Object> saveModule(@PathVariable(value = "courseId") UUID courseId,
                                              @RequestBody @Valid ModuleRecordDto moduleRecordDto){
-        CourseModel courseModel = courseService.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found"));
-
-        if(moduleService.existsTitle(moduleRecordDto.title())){
+        /*if(moduleService.existsTitle(moduleRecordDto.title())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Module Already exists!");
-        }
+        }*/
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(moduleService.save(moduleRecordDto, courseModel));
+                .body(moduleService.save(moduleRecordDto, courseService.findById(courseId)));
     }
 
     @GetMapping("/courses/{courseId}/modules")
@@ -46,20 +41,13 @@ public class ModuleController {
     @GetMapping("/courses/{courseId}/modules/{moduleId}")
     public ResponseEntity<Object> getOneModule(@PathVariable(value = "courseId") UUID courseId,
                                                @PathVariable(value = "moduleId") UUID moduleId){
-        /*CourseModel courseModel = courseService.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found"));
-
-        ModuleModel moduleModel = moduleService.findById(moduleId)
-                .orElseThrow(() -> new NotFoundException("Error: Modulo not Found"));*/
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.findModuleIntoCourse(courseId, moduleId));
     }
 
     @DeleteMapping("/courses/{courseId}/modules/{moduleId}")
     public ResponseEntity<Object> deleteModule(@PathVariable(value = "courseId") UUID courseId,
                                                @PathVariable(value = "moduleId") UUID moduleId){
-        /*ModuleModel moduleModel = moduleService.findById(moduleId)
-                .orElseThrow(() -> new NotFoundException("Error: Course not found"));*/
-        moduleService.delete(moduleService.findModuleIntoCourse(courseId, moduleId).get());
+        moduleService.delete(moduleService.findModuleIntoCourse(courseId, moduleId));
         return ResponseEntity.status(HttpStatus.OK).body("Module deleted successfully");
     }
 
@@ -67,8 +55,6 @@ public class ModuleController {
     public ResponseEntity<Object> updateModule(@PathVariable(value = "courseId") UUID courseId,
                                                @PathVariable(value = "moduleId") UUID moduleId,
                                                @RequestBody @Valid ModuleRecordDto moduleRecordDto){
-        /*ModuleModel moduleModel = moduleService.findById(moduleId)
-                .orElseThrow(() -> new NotFoundException("Error: Course not found"));*/
-        return ResponseEntity.status(HttpStatus.OK).body(moduleService.update(moduleRecordDto, moduleService.findModuleIntoCourse(courseId, moduleId).get()));
+        return ResponseEntity.status(HttpStatus.OK).body(moduleService.update(moduleRecordDto, moduleService.findModuleIntoCourse(courseId, moduleId)));
     }
 }

@@ -1,6 +1,8 @@
 package com.ead.course.services.impl;
 
 import com.ead.course.dtos.ModuleRecordDto;
+import com.ead.course.exceptions.ConflictException;
+import com.ead.course.exceptions.NotFoundException;
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
@@ -14,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,48 @@ public class ModuleServiceImpl implements ModuleService {
         this.lessonRepository = lessonRepository;
     }
 
+    @Override
+    public ModuleModel save(ModuleRecordDto moduleRecordDto, CourseModel courseModel) {
+        var moduleModel = new ModuleModel();
+
+        if (moduleRepository.existsByTitle(moduleRecordDto.title())) {
+            throw new ConflictException("Error: Module already exists");
+        }
+
+        BeanUtils.copyProperties(moduleRecordDto, moduleModel);
+        moduleModel.setCourse(courseModel);
+        moduleModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        return moduleRepository.save(moduleModel);
+    }
+
+    @Override
+    public boolean existsTitle(String title) {
+        return moduleRepository.existsByTitle(title);
+    }
+
+
+    @Override
+    public List<ModuleModel> findAllModulesIntoCourse(UUID courseId) {
+        return moduleRepository.findAllModulesIntoCourse(courseId);
+    }
+
+    @Override
+    public List<ModuleModel> findAll() {
+        return moduleRepository.findAll();
+    }
+
+    @Override
+    public ModuleModel findById(UUID moduleId) {
+        return moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new NotFoundException("Error: Module not found"));
+    }
+
+    @Override
+    public ModuleModel findModuleIntoCourse(UUID courseId, UUID moduleId) {
+        return moduleRepository.findModelsIntoCourse(courseId, moduleId)
+                .orElseThrow(() -> new NotFoundException("Error: Module not found for this course"));
+    }
+
     @Transactional
     @Override
     public void delete(ModuleModel moduleModel){
@@ -37,34 +80,7 @@ public class ModuleServiceImpl implements ModuleService {
         moduleRepository.delete(moduleModel);
     }
 
-    @Override
-    public boolean existsTitle(String title) {
-        return moduleRepository.existsByTitle(title);
-    }
-
-    @Override
-    public ModuleModel save(ModuleRecordDto moduleRecordDto, CourseModel courseModel) {
-        var moduleModel = new ModuleModel();
-        BeanUtils.copyProperties(moduleRecordDto, moduleModel);
-        moduleModel.setCourse(courseModel);
-        moduleModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
-        return moduleRepository.save(moduleModel);
-    }
-
-    @Override
-    public List<ModuleModel> findAll() {
-        return moduleRepository.findAll();
-    }
-
-    @Override
-    public Optional<ModuleModel> findById(UUID moduleId) {
-        Optional<ModuleModel> moduleModel = moduleRepository.findById(moduleId);
-        if(moduleModel.isEmpty()){
-            // exception
-        }
-        return moduleRepository.findById(moduleId);
-    }
-
+    @Transactional
     @Override
     public ModuleModel update(ModuleRecordDto moduleRecordDto, ModuleModel moduleModel) {
         BeanUtils.copyProperties(moduleRecordDto, moduleModel);
@@ -72,17 +88,4 @@ public class ModuleServiceImpl implements ModuleService {
         return moduleRepository.save(moduleModel);
     }
 
-    @Override
-    public List<ModuleModel> findAllModulesIntoCourse(UUID courseId) {
-        return moduleRepository.findAllModulesIntoCourse(courseId);
-    }
-
-    @Override
-    public Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId) {
-        Optional<ModuleModel> moduleModelOptional = moduleRepository.findModelsIntoCourse(courseId, moduleId);
-        if(moduleModelOptional.isEmpty()){
-           //
-        }
-        return moduleModelOptional;
-    }
 }

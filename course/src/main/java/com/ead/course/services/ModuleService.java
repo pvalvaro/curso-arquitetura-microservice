@@ -5,7 +5,6 @@ import com.ead.course.models.CourseModel;
 import com.ead.course.models.ModuleModel;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ModuleService {
@@ -17,11 +16,11 @@ public interface ModuleService {
 
     List<ModuleModel> findAll();
 
-    Optional<ModuleModel> findById(UUID moduleId);
+    ModuleModel findById(UUID moduleId);
 
     ModuleModel update(ModuleRecordDto moduleRecordDto, ModuleModel moduleModel);
 
     List<ModuleModel> findAllModulesIntoCourse(UUID courseId);
 
-    Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId);
+    ModuleModel findModuleIntoCourse(UUID courseId, UUID moduleId);
 }

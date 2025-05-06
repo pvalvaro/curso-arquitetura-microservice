@@ -1,7 +1,6 @@
 package com.ead.course.controllers;
 
 import com.ead.course.dtos.LessonRecordDto;
-import com.ead.course.exceptions.NotFoundException;
 import com.ead.course.models.LessonModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
@@ -29,7 +28,7 @@ public class LessonController {
         /*if(lessonService.existsByTitle(lessonRecordDto.title())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Title already exists!");
         }*/
-        return ResponseEntity.status(HttpStatus.CREATED).body(lessonService.save(lessonRecordDto, moduleService.findById(moduleId).get()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(lessonService.save(lessonRecordDto, moduleService.findById(moduleId)));
     }
 
     @GetMapping("/modules/{moduleId}/lessons")
@@ -40,17 +39,13 @@ public class LessonController {
     @GetMapping("/modules/{moduleId}/lessons/{lessonId}")
     public ResponseEntity<Object> getOneLesson(@PathVariable(value = "moduleId") UUID moduleId,
                                                @PathVariable(value = "lessonId") UUID lessonId){
-        /*LessonModel lessonModel = lessonService.findById(lessonId)
-                .orElseThrow(() -> new NotFoundException("Error: Lesson not found!"));*/
-        return ResponseEntity.status(HttpStatus.OK).body(lessonService.findLessonIntoModule(moduleId, lessonId).get());
+        return ResponseEntity.status(HttpStatus.OK).body(lessonService.findLessonIntoModule(moduleId, lessonId));
     }
 
     @DeleteMapping("/modules/{moduleId}/lessons/{lessonId}")
     public ResponseEntity<Object> deleteLesson(@PathVariable(value = "moduleId") UUID moduleId,
                                                @PathVariable(value = "lessonId") UUID lessonId){
-        /*LessonModel lessonModel = lessonService.findById(lessonId)
-                .orElseThrow(() -> new NotFoundException("Error: Lesson not found!"));*/
-        lessonService.delete(lessonService.findLessonIntoModule(moduleId, lessonId).get());
+        lessonService.delete(lessonService.findLessonIntoModule(moduleId, lessonId));
         return ResponseEntity.status(HttpStatus.OK).body("Lesson deleted successfully");
     }
 
@@ -58,8 +53,6 @@ public class LessonController {
     public ResponseEntity<Object> updateLesson(@PathVariable(value = "moduleId") UUID moduleId,
                                                @PathVariable("lessonId") UUID lessonId,
                                                @RequestBody @Valid LessonRecordDto lessonRecordDto){
-        /*LessonModel lessonModel = lessonService.findById(lessonId)
-                .orElseThrow(() -> new NotFoundException("Error: Lesson not found!"));*/
-        return ResponseEntity.status(HttpStatus.OK).body(lessonService.update(lessonRecordDto, lessonService.findLessonIntoModule(moduleId, lessonId).get()));
+        return ResponseEntity.status(HttpStatus.OK).body(lessonService.update(lessonRecordDto, lessonService.findLessonIntoModule(moduleId, lessonId)));
     }
 }
