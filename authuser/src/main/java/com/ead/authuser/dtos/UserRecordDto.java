@@ -1,10 +1,13 @@
 package com.ead.authuser.dtos;
 
 import com.ead.authuser.dtos.views.UserView;
+import com.ead.authuser.enums.UserStatus;
+import com.ead.authuser.enums.UserType;
 import com.ead.authuser.validations.PasswordConstraint;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserRecordDto(
@@ -12,7 +15,7 @@ public record UserRecordDto(
         @Size(min = 4, max = 50, groups = UserView.RegistrationPost.class, message = "Size must be between 4 and 50")
         @JsonView(UserView.RegistrationPost.class)
         String username,
-        @NotBlank(groups = UserView.RegistrationPost.class, message = "Emais is mandatory")
+        @NotBlank(groups = UserView.RegistrationPost.class, message = "Email is mandatory")
         @Email(groups = UserView.RegistrationPost.class, message = "Email must be in the expected format")
         @JsonView(UserView.RegistrationPost.class)
         String email,
@@ -31,6 +34,13 @@ public record UserRecordDto(
         String fullName,
         @JsonView({UserView.RegistrationPost.class, UserView.UserPut.class})
         String phoneNumber,
+        @NotNull(groups = {UserView.RegistrationPost.class, UserView.UserPut.class}, message = "UserType is mandatory")
+        @JsonView({UserView.RegistrationPost.class, UserView.UserPut.class})
+        UserType userType,
+
+        @NotNull(groups = {UserView.RegistrationPost.class, UserView.UserPut.class}, message = "UserStatus is mandatory")
+        @JsonView({UserView.RegistrationPost.class, UserView.UserPut.class})
+        UserStatus userStatus,
         @NotBlank(groups = UserView.ImagePut.class, message = "Image URL is mandatory")
         @JsonView({UserView.ImagePut.class})
         String imageUrl

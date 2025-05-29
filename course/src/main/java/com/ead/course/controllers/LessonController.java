@@ -4,7 +4,10 @@ import com.ead.course.dtos.LessonRecordDto;
 import com.ead.course.models.LessonModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
+import com.ead.course.specifications.SpecificationTemplate;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,15 +28,14 @@ public class LessonController {
     @PostMapping("/modules/{moduleId}/lessons")
     public ResponseEntity<Object> saveLesson(@PathVariable(value = "moduleId") UUID moduleId,
                                              @RequestBody @Valid LessonRecordDto lessonRecordDto){
-        /*if(lessonService.existsByTitle(lessonRecordDto.title())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Title already exists!");
-        }*/
         return ResponseEntity.status(HttpStatus.CREATED).body(lessonService.save(lessonRecordDto, moduleService.findById(moduleId)));
     }
 
     @GetMapping("/modules/{moduleId}/lessons")
-    public ResponseEntity<List<LessonModel>> getAllLessons(@PathVariable(value = "moduleId") UUID moduleId){
-        return ResponseEntity.status(HttpStatus.OK).body(lessonService.findAllLessonsIntoModule(moduleId));
+    public ResponseEntity<Page<LessonModel>> getAllLessons(@PathVariable(value = "moduleId") UUID moduleId,
+                                                           SpecificationTemplate.Lessonpec spec, Pageable pageable){
+        return ResponseEntity.status(HttpStatus.OK).body(lessonService.findAllLessonsIntoModule(
+                SpecificationTemplate.lessonModuleId(moduleId).and(spec), pageable));
     }
 
     @GetMapping("/modules/{moduleId}/lessons/{lessonId}")

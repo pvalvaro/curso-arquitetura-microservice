@@ -2,12 +2,10 @@ package com.ead.course.services;
 
 import com.ead.course.dtos.CourseRecordDto;
 import com.ead.course.models.CourseModel;
-import com.ead.course.specifications.SpecificationTemplate;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-
-import java.awt.print.Pageable;
 import java.util.UUID;
 
 public interface CourseService {

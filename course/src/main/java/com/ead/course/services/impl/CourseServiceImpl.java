@@ -12,11 +12,11 @@ import com.ead.course.repositories.ModuleRepository;
 import com.ead.course.services.CourseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;

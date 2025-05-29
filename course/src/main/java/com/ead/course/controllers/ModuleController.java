@@ -4,7 +4,11 @@ import com.ead.course.dtos.ModuleRecordDto;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.services.ModuleService;
+import com.ead.course.specifications.SpecificationTemplate;
 import jakarta.validation.Valid;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +29,15 @@ public class ModuleController {
     @PostMapping("/courses/{courseId}/modules")
     public ResponseEntity<Object> saveModule(@PathVariable(value = "courseId") UUID courseId,
                                              @RequestBody @Valid ModuleRecordDto moduleRecordDto){
-        /*if(moduleService.existsTitle(moduleRecordDto.title())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Module Already exists!");
-        }*/
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(moduleService.save(moduleRecordDto, courseService.findById(courseId)));
     }
 
     @GetMapping("/courses/{courseId}/modules")
-    public ResponseEntity<List<ModuleModel>> getAllModules(@PathVariable(value = "courseId") UUID courseId){
+    public ResponseEntity<Page<ModuleModel>> getAllModules(@PathVariable(value = "courseId") UUID courseId,
+                                                           SpecificationTemplate.ModuleSpec spec, Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(moduleService.findAllModulesIntoCourse(courseId));
+                .body(moduleService.findAllModulesIntoCourse(SpecificationTemplate.moduleCourseId(courseId).and(spec), pageable));
     }
 
     @GetMapping("/courses/{courseId}/modules/{moduleId}")

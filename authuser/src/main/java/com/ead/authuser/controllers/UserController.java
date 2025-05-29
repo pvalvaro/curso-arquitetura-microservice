@@ -2,7 +2,6 @@ package com.ead.authuser.controllers;
 
 import com.ead.authuser.dtos.UserRecordDto;
 import com.ead.authuser.dtos.views.UserView;
-import com.ead.authuser.exceptions.NotFoundException;
 import com.ead.authuser.models.UserModel;
 import com.ead.authuser.services.UserService;
 import com.ead.authuser.specifications.SpecificationTemplate;
@@ -38,15 +37,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userModelPage);
     }
     @GetMapping("/{userId}")
-    public UserModel getOneUser(@PathVariable(value = "userId")UUID userId){
-        return userService.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Error: User not found."));
+    public ResponseEntity<Object> getOneUser(@PathVariable(value = "userId")UUID userId){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(userId));
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable(value = "userId")UUID userId){
-        var userModel = getOneUser(userId);
-        userService.delete(userModel);
+        userService.delete(userService.findById(userId));
         return ResponseEntity.status(HttpStatus.OK).body("User deleted sucessfully");
     }
 
@@ -55,9 +52,7 @@ public class UserController {
                                              @RequestBody @Validated(UserView.UserPut.class)
                                              @JsonView(UserView.UserPut.class)
                                              UserRecordDto userRecordDto){
-
-        var userModel = getOneUser(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRecordDto, userModel));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userRecordDto, userService.findById(userId)));
     }
 
     @PutMapping("/{userId}/password")
@@ -66,11 +61,7 @@ public class UserController {
                                              @JsonView(UserView.PasswordPut.class)
                                              UserRecordDto userRecordDto){
 
-        var userModel = getOneUser(userId);
-        if(!userModel.getPassword().equals(userRecordDto.oldPassword())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Mismatched old password!");
-        }
-        userService.updatePassword(userRecordDto, userModel);
+        userService.updatePassword(userRecordDto, userService.findById(userId));
         return ResponseEntity.status(HttpStatus.OK).body("Password updated successfully");
     }
 
@@ -79,9 +70,7 @@ public class UserController {
                                                  @RequestBody @Validated(UserView.ImagePut.class)
                                                  @JsonView(UserView.ImagePut.class)
                                                  UserRecordDto userRecordDto){
-
-        var userModel = getOneUser(userId);
-        userService.updateImage(userRecordDto, userModel);
+        userService.updateImage(userRecordDto, userService.findById(userId));
         return ResponseEntity.status(HttpStatus.OK).body("Image updated successfully");
     }
 }

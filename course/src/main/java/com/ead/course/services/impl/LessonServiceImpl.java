@@ -8,6 +8,9 @@ import com.ead.course.models.ModuleModel;
 import com.ead.course.repositories.LessonRepository;
 import com.ead.course.services.LessonService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +65,11 @@ public class LessonServiceImpl implements LessonService {
     public LessonModel findLessonIntoModule(UUID moduleId, UUID lessonId) {
         return lessonRepository.findLessonIntoModule(moduleId, lessonId)
                 .orElseThrow(() -> new NotFoundException("Error: Lesson not found for this module"));
+    }
+
+    @Override
+    public Page findAllLessonsIntoModule(Specification<LessonModel> spec, Pageable pageable) {
+        return lessonRepository.findAll(spec, pageable);
     }
 
     @Transactional
