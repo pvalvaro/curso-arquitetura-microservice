@@ -35,9 +35,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseModel save(CourseRecordDto courseRecordDto) {
-        /*if (courseRepository.existsByName(courseRecordDto.name())) {
-            throw new ConflictException("Error: Course name already exists");
-        }*/
         var courseModel = new CourseModel();
         BeanUtils.copyProperties(courseRecordDto, courseModel);
         courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));

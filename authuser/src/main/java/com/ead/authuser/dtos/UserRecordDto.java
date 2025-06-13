@@ -38,9 +38,9 @@ public record UserRecordDto(
         @JsonView({UserView.RegistrationPost.class, UserView.UserPut.class})
         UserType userType,
 
-        @NotNull(groups = {UserView.RegistrationPost.class, UserView.UserPut.class}, message = "UserStatus is mandatory")
+        /*@NotNull(groups = {UserView.RegistrationPost.class, UserView.UserPut.class}, message = "UserStatus is mandatory")
         @JsonView({UserView.RegistrationPost.class, UserView.UserPut.class})
-        UserStatus userStatus,
+        UserStatus userStatus,*/
         @NotBlank(groups = UserView.ImagePut.class, message = "Image URL is mandatory")
         @JsonView({UserView.ImagePut.class})
         String imageUrl

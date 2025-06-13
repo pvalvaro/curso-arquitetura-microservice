@@ -38,16 +38,17 @@ public class CourseValidator implements Validator {
     public void validate(Object o, Errors errors) {
         CourseRecordDto courseRecordDto = (CourseRecordDto) o;
         validator.validate(courseRecordDto, errors);
-        if(!errors.hasErrors()){
-            validateCourseName(courseRecordDto, errors);
-            validateInstructor(courseRecordDto.userInstructor(), errors);
-        }
+
+        if(errors.hasErrors()) return;
+
+        validateCourseName(courseRecordDto, errors);
+        validateInstructor(courseRecordDto.userInstructor(), errors);
     }
 
     private void validateCourseName(CourseRecordDto courseRecordDto, Errors errors) {
         if(courseService.existsByName(courseRecordDto.name())) {
             errors.rejectValue("name", "courseNameConflict", "Course name already exists");
-            logger.debug("Error validation courseName {}", courseRecordDto.name());
+            logger.error("Error validation courseName {}", courseRecordDto.name());
         }
     }
 
@@ -56,12 +57,12 @@ public class CourseValidator implements Validator {
         if(responseUser.getBody().userType().equals(UserType.STUDENT) ||
             responseUser.getBody().userType().equals(UserType.USER)){
             errors.rejectValue("userInstructor", "userInstructorError", "User must be INSTRUCTOR or ADMIN.");
-            logger.debug("Error validation userInstructor {}", userInstructor);
+            logger.error("Error validation userInstructor {}", userInstructor);
         }
 
         if(responseUser.getBody().userStatus().equals(UserStatus.BLOCKED)){
             errors.rejectValue("userInstructor", "userInstructorBlocked", "User is BLOCKED");
-            logger.debug("Error validation userInstructor {}", userInstructor);
+            logger.error("Error validation userInstructor {}", userInstructor);
         }
     }
 }
