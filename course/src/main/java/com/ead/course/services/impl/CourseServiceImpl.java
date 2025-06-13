@@ -1,7 +1,6 @@
 package com.ead.course.services.impl;
 
 import com.ead.course.dtos.CourseRecordDto;
-import com.ead.course.exceptions.ConflictException;
 import com.ead.course.exceptions.NotFoundException;
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.LessonModel;
@@ -26,7 +25,7 @@ import java.util.UUID;
 public class CourseServiceImpl implements CourseService {
     final CourseRepository courseRepository;
     final ModuleRepository moduleRepository;
-    private final LessonRepository lessonRepository;
+    final LessonRepository lessonRepository;
 
     public CourseServiceImpl(CourseRepository courseRepository, ModuleRepository moduleRepository, LessonRepository lessonRepository) {
         this.courseRepository = courseRepository;
@@ -36,10 +35,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseModel save(CourseRecordDto courseRecordDto) {
-
-        if (courseRepository.existsByName(courseRecordDto.name())) {
+        /*if (courseRepository.existsByName(courseRecordDto.name())) {
             throw new ConflictException("Error: Course name already exists");
-        }
+        }*/
         var courseModel = new CourseModel();
         BeanUtils.copyProperties(courseRecordDto, courseModel);
         courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
