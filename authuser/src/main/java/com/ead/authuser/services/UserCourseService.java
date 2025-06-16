@@ -7,4 +7,7 @@ import java.util.UUID;
 
 public interface UserCourseService {
     UserCourseModel saveSubscriptionUserInCourse(UUID userId, UserCourseRecordDto userCourseRecordDto);
+    boolean existsByCourseId(UUID courseId);
+
+    void deleteAllByCourseId(UUID courseId);
 }

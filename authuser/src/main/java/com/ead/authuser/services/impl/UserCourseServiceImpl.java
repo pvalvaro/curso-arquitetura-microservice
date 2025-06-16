@@ -8,6 +8,7 @@ import com.ead.authuser.repositories.UserCourseRepository;
 import com.ead.authuser.services.UserCourseService;
 import com.ead.authuser.services.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -28,5 +29,16 @@ public class UserCourseServiceImpl implements UserCourseService {
             throw new ConflictException("Error: Subscription already exists!");
         }
         return userCourseRepository.save(userModel.convertToUserCourseModel(userCourseRecordDto.courseId()));
+    }
+
+    @Override
+    public boolean existsByCourseId(UUID courseId) {
+        return userCourseRepository.existsByCourseId(courseId);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllByCourseId(UUID courseId) {
+        userCourseRepository.deleteAllByCourseId(courseId);
     }
 }
