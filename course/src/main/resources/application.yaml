@@ -24,7 +24,7 @@ spring:
 ead:
   api:
     url:
-      authuser: 'http://EAD-COURSE-SERVICE/ead-authuser'
+      authuser: 'http://ead-course-service/ead-authuser'
 
 eureka:
   client:
