@@ -7,7 +7,7 @@ spring:
   application:
     name: ead-course-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/ead-course
+    url: jdbc:postgresql://localhost:5432/ead-course-v2
     username: postgres
     password: wete2808
     driver-class-name: org.postgresql.Driver
@@ -17,7 +17,6 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           lob:
             non-contextual-creation: true
